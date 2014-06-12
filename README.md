@@ -1,7 +1,7 @@
 dMCMC
 =====
 
-Markov chain Monti Carlo diagnostic (**dMCMC**). A set of function that create multipanel plots to quickly evaluate MCMC output, and easily convert MCMC chain lists (returned by e.g. rjags) into handy-dandy latex tables. The motor behind these functions are the excellent R packages **xtable** and **coda**. Though, the innovation here is that dMCMC will aggregate the most useful information in a single graph or rapidly format a tables for you. Crucially dMCMC adds prior v.s. posteriors plots to the mix, which can be crucial to compare.  
+Markov chain Monti Carlo diagnostic (**dMCMC**). A set of functions that create multipanel plots to quickly evaluate MCMC output, and easily convert MCMC chain lists (returned by e.g. rjags) into handy-dandy latex tables. The motor behind these functions are the excellent R packages **xtable** and **coda**. Though, the main goal of dMCMC is to aggregate the most useful information in a single attractive graph or rapidly format a tables for you. Which, if you work with numerous different Bayesian models daily, can be a major waste of time. One innovation that dMCMC adds to the mix is prior v.s. posteriors plots, which can be a crucial consideration, if one wan't to scrutenize choice of priors amonst other things.  
 
 ## Installation
 
@@ -19,5 +19,7 @@ update.packages()
 library(devtools)
 install_github("dMCMC", "MarcoDVisser")
 ```
+
+## examples
 
 ## Screenshots
