@@ -20,6 +20,15 @@ library(devtools)
 install_github("dMCMC", "MarcoDVisser")
 ```
 
+If you plan to use dMCMCs ability to find the priors directly in your BUGS/JAGS model file you will also need to 
+download and install [r2bugs](https://github.com/dlebauer/r2bugs). This package assist in converting distributions between R and BUGS format. It can be installed as `dMCMC` with;
+
+```r
+install_github("r2bugs", "dlebauer")
+```
+
+Otherwise you will need to specify the priors yourself (in the correct R format).
+
 ## examples
 
 ## Screenshots
