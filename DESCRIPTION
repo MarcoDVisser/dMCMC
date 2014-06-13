@@ -1,0 +1,16 @@
+Package: dMCMC
+Type: Package
+Title: A compilation of diagnostic tools for mcmc evaluation
+Version: 0.1
+Date: 2014-06-06
+Author: Marco D. Visser
+Maintainer: Marco D. Visser <marco.d.visser@gmail.com>
+Description: One graph for all your MCMC needs,
+    one function to produce pretty tables from your
+    MCMC object.
+License: MIT
+Depends:
+    coda,
+    rjags
+Imports:
+    xtable
