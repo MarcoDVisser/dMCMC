@@ -32,3 +32,6 @@ Otherwise you will need to specify the priors yourself (in the correct R format)
 ## examples
 
 ## Screenshots
+**The first test plot:**
+![](http://i.imgur.com/dk5XU2N.png)
+
