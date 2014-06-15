@@ -24,7 +24,7 @@ install_github("dMCMC", "MarcoDVisser")
 
 `dMCMCs` has the ability to find the priors directly in your BUGS/JAGS model file and translate these to their R equivalents. Here is an example for a model file called "TestJagsModel.R":
 
-```
+```r
 findRprior(model="./models/TestJagsModel.R","Beta1")
 ## [1] "BUGS prior identified as:  Beta1~dunif(-100,1000)"
 ## [1] "BUGS prior translated to: dunif"
@@ -35,7 +35,7 @@ findRprior(model="./models/TestJagsModel.R","Beta1")
 ## [[2]][[1]]
 ## [1] -100 1000
 
-```r
+```
 
 more to follow. 
 
