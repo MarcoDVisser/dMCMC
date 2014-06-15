@@ -20,16 +20,24 @@ library(devtools)
 install_github("dMCMC", "MarcoDVisser")
 ```
 
-If you plan to use dMCMCs ability to find the priors directly in your BUGS/JAGS model file you will also need to 
-download and install [r2bugs](https://github.com/dlebauer/r2bugs). This package assist in converting distributions between R and BUGS format. It can be installed as `dMCMC` with;
+## examples
+
+`dMCMCs` has the ability to find the priors directly in your BUGS/JAGS model file and translate these to their R equivalents. Here is an example for a model file called "TestJagsModel.R":
+
+```
+findRprior(model="./models/TestJagsModel.R","Beta1")
+## [1] "BUGS prior identified as:  Beta1~dunif(-100,1000)"
+## [1] "BUGS prior translated to: dunif"
+## [[1]]
+## [1] "dunif"
+
+## [[2]]
+## [[2]][[1]]
+## [1] -100 1000
 
 ```r
-install_github("r2bugs", "dlebauer")
-```
 
-Otherwise you will need to specify the priors yourself (in the correct R format).
-
-## examples
+more to follow. 
 
 ## Screenshots
 **The first test plot:**
