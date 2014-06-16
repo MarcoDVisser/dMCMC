@@ -55,11 +55,17 @@
 dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
                       model=NULL,Rprior=NULL,...) {
 
-  opar <- par()
+  opar<-par("mar","bg")
 
   ## run checks
   if(is.null(mcmcobject)|is.null(interest)) {
     stop("One of the inputs is null. Please check the input objects")}
+
+  chainsamplenames <- attr(mcmcobject[[1]],"dimnames")[[2]]
+
+  if(!is.element(interest,chainsamplenames)) {
+    stop("One of the inputs is null. Please check the input objects")}
+ 
   
   if(is.null(Rprior)&is.null(model)) {
     stop("Either specify the model OR the Rprior")
