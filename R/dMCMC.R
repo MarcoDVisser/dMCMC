@@ -4,7 +4,12 @@
 ##" from a MCMC chain.  See the exampe below for more details.
 ##' @title Create a multiple diagnostic plot
 ##' @param mcmcobject a mcmc object (list of samples).
-##' @param interest a set of parameters to produce
+##' @param interest a set of parameters of interest. These should have
+##' true priors (e.g. can be directly related to a prior distribution).
+##' Lower-level priors, that depend on a hyperprior, will fail
+##' as dMCMC does not attempt to understand the hierachical
+##' structure of the model file.
+##' 
 ##' @param model the path to the BUGs/JAGS model text file with
 ##' the priors specified. This model must be the one
 ##' that generated the MCMC list. 
@@ -18,13 +23,30 @@
 ##' pdf is advised. Otherwise the function forces par(ask=TRUE).
 ##' @author Marco D. Visser
 ##' @examples
-##' \dontrun{
-##'    # create function 
-##'      foo <- function(N){
-##'      N   
-##'      }
-##' 
+##' sink("examp.txt")
+##' cat( "
+##' model {
+##'	for (i in 1:N) {
+##'		x[i] ~ dnorm(mu, tau)
 ##'	}
+##'	mu ~ dnorm(0, .0001)
+##'	tau <- pow(sigma, -2)
+##'	sigma ~ dunif(0, 100)
+##'     } ",fill=TRUE)
+##'      sink()
+##'
+##' jags <- jags.model('examp.txt',
+##'                   data = list('x' = rnorm(100,2,2),
+##'                               'N'=100),
+##'                   n.chains = 4,
+##'                   n.adapt = 100)
+##' 
+##' mysamples <- coda.samples(jags, c('mu', 'tau'),100)
+##'
+##' dMCMCplot(mysamples,"mu","examp.txt")
+##'
+##'
+##'
 ##' @seealso \code{\link{jags.model}}
 ##' @return A multipanel plot
 ##' @concept MCMC diagnostics
@@ -39,8 +61,8 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   if(is.null(mcmcobject)|is.null(interest)) {
     stop("One of the inputs is null. Please check the input objects")}
   
-  if(is.null(prior)&is.null(model)) {
-    stop("Either specify the model OR the prior")
+  if(is.null(Rprior)&is.null(model)) {
+    stop("Either specify the model OR the Rprior")
    }
 
   
@@ -51,7 +73,7 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   } else{
     
   
-  if(is.null(prior)){
+  if(is.null(Rprior)){
     Rtranslation <- findRprior(model=model,interest=interest
                                ,silent=TRUE)
     ## Build prior function 
@@ -125,8 +147,8 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
         col='grey20')
   postmean <- mean(sapply(posterlong,mean))
   abline(h=postmean,lty=2,lwd=2)
-  text(mcpars[1]+(0.5*(mcpars[2]-mcpars[1])),postmean,
-       "Mean",cex=2, col='grey40')
+  text(mcpars[1]+(0.1*(mcpars[2]-mcpars[1])),postmean,
+       "Mean",cex=2, col='white')
 
   boxplot(posterlong,col=colorz)
   abline(h=postmean,lty=2,lwd=2)
@@ -188,13 +210,32 @@ findRprior <- function(model=NULL,interest=NULL,silent=FALSE){
    }
 
   ModelFile <- readLines(model)
+  ## find all relavent lines mentioning the prior
   filter1 <- grep(interest,ModelFile)
 
   if(length(filter1)==0){stop("Prior not found in the model file")}
 
-  filter2 <- grep("~",ModelFile)
-  PriorLine <- intersect(filter1,filter2)
+  ## remove white space
+  ModelFileNoWS <- sapply(1:length(ModelFile),
+                         function(X) gsub(" ", "",ModelFile[X]))
 
+  ## find the prior
+  filter2 <- grep(paste(interest,"~",sep=""),ModelFileNoWS)
+
+  if(length(filter2)!=1){
+    if(length(filter2)==0){
+      stop(paste("Prior",interest,
+                 "not found in model file (is it a true prior?), check inputs?"
+                 ))
+    } else {
+    cat("Multiple lines were found to correspond to the prior\n")
+    cat("Identified lines were: \n ")
+    print(ModelFile[filter2])
+    cat("Are these the true priors or aliases? \n ") 
+    stop("No unique prior found in model file")}}
+
+  PriorLine <- filter2
+    
   ## find the prior and remove whitespace
   BUGSprior <- gsub(" ", "",ModelFile[PriorLine])
   if(!silent){
@@ -205,7 +246,9 @@ findRprior <- function(model=NULL,interest=NULL,silent=FALSE){
   FulldensityBUGS <- PriorSplit[[1]][[1]][2]
 
   ## extract coefficients - thanks to Lazar!
-  numbermatch <- gregexpr('(-|)[0-9]+\\.*[0-9]*',FulldensityBUGS)
+  ## one regex to rule them all : '(-|)[0-9]+\\.*[0-9]*|*\\d+([e|E][+\\-]*\\d*)'
+  numbermatch <- gregexpr('(-|)[0-9]+\\.*[0-9]*|*\\d+([e|E][+\\-]*\\d*)'
+                          ,FulldensityBUGS)
   coefsBUGS <- regmatches(FulldensityBUGS,numbermatch)
   dfBUGS <- strsplit(FulldensityBUGS,"\\(")[[1]][1]
   Rtranslation <- BUGS2RTranslator(dfBUGS,coefsBUGS)
@@ -247,7 +290,7 @@ BUGS2RTranslator <- function(bugsname="norm",bugsparameters=list(c(1,1))) {
     }
   ## Remove potential confusion due to "d" in e.g. dnorm
   bugsname_d<- lapply(bugsname,function(X) gsub("d","",X))
-  bugsname_d<- as.character(unlist(bugsname))
+  bugsname_d<- as.character(unlist(bugsname_d))
 
   ## Search patterns with word boundries for exact matches for nested
   ## words

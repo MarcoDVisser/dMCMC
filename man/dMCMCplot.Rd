@@ -9,7 +9,11 @@ dMCMCplot(mcmcobject = NULL, interest = NULL, model = NULL,
 \arguments{
 \item{mcmcobject}{a mcmc object (list of samples).}
 
-\item{interest}{a set of parameters to produce}
+\item{interest}{a set of parameters of interest. These should have
+true priors (e.g. can be directly related to a prior distribution).
+Lower-level priors, that depend on a hyperprior, will fail
+as dMCMC does not attempt to understand the hierachical
+structure of the model file.}
 
 \item{model}{the path to the BUGs/JAGS model text file with
 the priors specified. This model must be the one
@@ -35,13 +39,27 @@ dMCMCplot Create the untimate diagnostic plot for a MCMC chain
 Creates a multipanel graphic with diagnostics on parameter samples
 }
 \examples{
-\dontrun{
-   # create function
-     foo <- function(N){
-     N
-     }
-
+sink("examp.txt")
+cat( "
+model {
+	for (i in 1:N) {
+		x[i] ~ dnorm(mu, tau)
 	}
+	mu ~ dnorm(0, .0001)
+	tau <- pow(sigma, -2)
+	sigma ~ dunif(0, 100)
+    } ",fill=TRUE)
+     sink()
+
+jags <- jags.model('examp.txt',
+                  data = list('x' = rnorm(100,2,2),
+                              'N'=100),
+                  n.chains = 4,
+                  n.adapt = 100)
+
+mysamples <- coda.samples(jags, c('mu', 'tau'),100)
+
+dMCMCplot(mysamples,"mu","examp.txt")
 }
 \author{
 Marco D. Visser

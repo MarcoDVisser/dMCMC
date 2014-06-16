@@ -41,5 +41,5 @@ more to follow.
 
 ## Screenshots
 **The first test plot:**
-![](http://i.imgur.com/dk5XU2N.png)
+![](http://i.imgur.com/J60k45r.png)
 
