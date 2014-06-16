@@ -56,6 +56,7 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
                       model=NULL,Rprior=NULL,...) {
 
   opar<-par("mar","bg")
+  on.exit(par(opar))
 
   ## run checks
   if(is.null(mcmcobject)|is.null(interest)) {
@@ -64,7 +65,7 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   chainsamplenames <- attr(mcmcobject[[1]],"dimnames")[[2]]
 
   if(!is.element(interest,chainsamplenames)) {
-    stop("One of the inputs is null. Please check the input objects")}
+    stop(paste(interest,"not found in MCMC samples"))}
  
   
   if(is.null(Rprior)&is.null(model)) {
@@ -106,7 +107,8 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   } else {stop("priors with > 2 parameters not supported")}
 
   ## Start building the plot
-  par(mar=c(0,0,0,0),bg="grey70")
+  par(mar=c(0,0,0,0),bg="grey70",mgp = c(0, -1.4, 0),
+      lab=c(4,2,3),tck=-.05,las=1,col.axis="white",col.lab='white')
   layoutmat <- matrix(
                  c(3,3,3,3,4,4,4,4,1,1,
                    3,3,3,3,4,4,4,4,1,1,
@@ -159,14 +161,6 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   boxplot(posterlong,col=colorz)
   abline(h=postmean,lty=2,lwd=2)
 
-  Autocor <- acf(posterlong[[1]])
-  acfcoords <- par("usr")
-  text(acfcoords[1]+(0.5*(acfcoords[2]-acfcoords[1])),
-       acfcoords[3]+
-       (acfcoords[4]-acfcoords[3])*0.5
-       ,"ACF",cex=4,
-       col='grey20')
-
   subsetpost <- as.mcmc.list(lapply(mcmcobject,function(X) X[,1]))
   gelman.plot(subsetpost,auto.layout=FALSE)
 
@@ -177,7 +171,16 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
        ,"Gelman diagnostic",cex=2,
        col='grey20')
 
-  plot(0, 0, type="n", xlab="", ylab="",xlim=c(0,1),ylim=c(0,1))
+  Autocor <- acf(posterlong[[1]])
+  acfcoords <- par("usr")
+  text(acfcoords[1]+(0.5*(acfcoords[2]-acfcoords[1])),
+       acfcoords[3]+
+       (acfcoords[4]-acfcoords[3])*0.5
+       ,"ACF",cex=4,
+       col='grey20')
+
+  plot(0, 0, type="n", xlab="", ylab="",xlim=c(0,1),ylim=c(0,1),
+       xaxt='n',yaxt='n')
   text(0.4,0.75,paste("Summary for:", interest))
   text(0.4,0.65,paste("Max iter:", mcpars[2]))
   text(0.4,0.55,paste("Thinning:", mcpars[3]))
@@ -186,8 +189,7 @@ dMCMCplot <- function(mcmcobject=NULL, interest=NULL,
   text(0.4,0.25,paste("Prop. difference:",round(
                       100*((mean(priorsamples)-postmean)/postmean),3)))
   
-  par(opar)
-}
+  }
 }
 
 ##' findRprior seives through your model files to find and
