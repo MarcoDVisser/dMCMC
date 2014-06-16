@@ -20,26 +20,58 @@ library(devtools)
 install_github("dMCMC", "MarcoDVisser")
 ```
 
-## examples
-
-`dMCMCs` has the ability to find the priors directly in your BUGS/JAGS model file and translate these to their R equivalents. Here is an example for a model file called "TestJagsModel.R":
+## Examples
 
 ```r
-findRprior(model="./models/TestJagsModel.R","Beta1")
-## [1] "BUGS prior identified as:  Beta1~dunif(-100,1000)"
-## [1] "BUGS prior translated to: dunif"
-## [[1]]
-## [1] "dunif"
-
-## [[2]]
-## [[2]][[1]]
-## [1] -100 1000
-
+ require(dMCMC)
+ sink("examp.txt")
+     cat( "
+     model {
+             for (i in 1:N) {
+                     x[i] ~ dnorm(mu, tau)
+             }
+             mu ~ dnorm(0, .0001)
+             tau <- pow(sigma, -2)
+             sigma ~ dunif(0, 100)
+         } ",fill=TRUE)
+          sink()
+     
+     jags <- jags.model('examp.txt',
+                       data = list('x' = rnorm(100,2,2),
+                                   'N'=100),
+                       n.chains = 4,
+                       n.adapt = 100)
+     
+     mysamples <- coda.samples(jags, c('mu', 'tau'),100)
+     
+     dMCMCplot(mysamples,"mu","examp.txt")
+  
 ```
 
-more to follow. 
-
-## Screenshots
-**The first test plot:**
 ![](http://i.imgur.com/J60k45r.png)
+
+
+`dMCMCs` has the ability to find the priors directly in your BUGS/JAGS model file and translate these to their R equivalents. Here for the example above:
+
+
+```r
+findRprior("examp.txt","mu")
+```
+
+Which returns the accociated density function and translated parameters:
+
+```
+[1] "BUGS prior identified as:  mu~dnorm(0,.0001)"
+[1] "BUGS prior translated to: dnorm"
+[[1]]
+[1] "dnorm"
+
+[[2]]
+[[2]][[1]]
+[1] 0 1
+```
+
+
+** more to follow **
+
 
