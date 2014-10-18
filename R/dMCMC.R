@@ -287,8 +287,6 @@ findRprior <- function(model=NULL,interest=NULL,silent=FALSE){
 ##' @author Marco D. Visser
 ##' @examples
 ##' 	bugs2rTranslator("norm",list(c(10,100)))
-##' @concept MCMC diagnostics
-##'
 ##' @export
 BUGS2RTranslator <- function(bugsname="norm",bugsparameters=list(c(1,1))) {
 
@@ -305,11 +303,11 @@ BUGS2RTranslator <- function(bugsname="norm",bugsparameters=list(c(1,1))) {
   NestFunc <- c("\\bnbinom\\b","\\bnbin\\b","\\bbinom\\b","\\bbin\\b",
                 "\\bnorm\\b","\\blnorm\\b")
   ## Likely no word boundries needed here
-  UniqFunc <- c("weib","gamma","chisq","unif","pois")
+  UniqFunc <- c("weib","gamma","chisq","unif","pois","exp")
 
   Rnames <- c("dnbinom","dnbinom","dbinom","dbinom",
               "dnorm","dlnorm","dweibull","dgamma","dchisq",
-              "dunif","dpois")
+              "dunif","dpois","dexp")
     
 
   DistHits <- data.frame(sapply(c(NestFunc,UniqFunc),
