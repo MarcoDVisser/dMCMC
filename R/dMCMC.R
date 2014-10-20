@@ -288,12 +288,13 @@ findRprior <- function(model=NULL,interest=NULL,silent=FALSE){
 ##' @examples
 ##' 	bugs2rTranslator("norm",list(c(10,100)))
 ##' @export
-BUGS2RTranslator <- function(bugsname="norm",bugsparameters=list(c(1,1))) {
+BUGS2RTranslator <- function(bugsname="norm",bugsparameters=NULL) {
 
-  
+  if(!is.null(bugsparameters)){
   if(!is.element(class(bugsparameters),"list")){
     stop("parameters must be supplied as a list")
-    }
+  } }
+  
   ## Remove potential confusion due to "d" in e.g. dnorm
   bugsname_d<- lapply(bugsname,function(X) gsub("d","",X))
   bugsname_d<- as.character(unlist(bugsname_d))
