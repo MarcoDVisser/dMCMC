@@ -352,23 +352,16 @@ BUGS2RTranslator <- function(bugsname="norm",bugsparameters=NULL) {
   if(length(weib)>0){
     for(i in weib){
 
-      Rparameters[[i]] <- c(bugsparameters[[i]][1],
+     Rparameters[[i]] <- c(bugsparameters[[i]][1],
          bugsparameters[[i]][2]^(-1/bugsparameters[[i]][1]))
+
+   #   Rparameters[[i]]<- c(Rparameters[[i]][2],
+   #      Rparameters[[i]][1])
                              
    }
   }
 
 
-  if(length(weib)>0){
-    for(i in weib){
-
-      Rparameters[[i]] <- c(bugsparameters[[i]][2],
-         bugsparameters[[i]][1])
-                             
-   }
-  }
-
- 
   return(list(Rhits,Rparameters))
  } else {return(Rhits)}  
 
